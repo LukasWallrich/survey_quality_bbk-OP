@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistical power</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Lukas Wallrich" />
+    <script src="index_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistical power
+## and sample size determination
+### Lukas Wallrich
+### Birkbeck OP - Quant Group
+### 2021/10/26
+
+---
+
+
+
+
+
+
+class: center, middle
+
+# Recap: Null-hypothesis significance testing
+--
+
+## .red[How likely is our data under the null hypothesis?]
+
+--
+## &lt; &amp;alpha; *reject* | &gt; &amp;alpha; *accept* the null
+
+---
+class: inverse, center, middle
+
+# Power
+
+#### Probability of __correctly__ rejecting null hypothesis
+
+--
+
+# Publication bias
+
+#### Tendency to only/mostly publish __significant__ results
+
+---
+## Psychological studies are under-powered
+
+![Power in psychology studies](Stanley et al - Table1.jpg)
+#### General Aim: run studies with at least **80% power**
+#### Studies reporting **mean differences** - likely experiments - particularly underpowered
+
+.footnote[[Stanley et al., 2018](http://www2.psych.utoronto.ca/users/tafarodi/psy428/articles/Stanley%20et%20al.%20%282018%29.pdf)]
+---
+
+# Simulation results - 20% power
+
+
+```r
+library(pwr)
+pwr.t.test(d = .2, power = .2, sig.level = .05)
+```
+
+--
+
+
+```
+## 
+##      Two-sample t test power calculation 
+## 
+##               n = 63.08413
+##               d = 0.2
+##       sig.level = 0.05
+##           power = 0.2
+##     alternative = two.sided
+## 
+## NOTE: n is number in *each* group
+```
+
+
+---
+
+#### Results of **5000 experiments** with *d* = .2, *N* = 63 per group
+
+&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
+
+#### Minimum significant effect size: *d* = .36
+#### Average significant effect size: *d* = .45
+#### Share of studies with significant results: 19.5%
+
+---
+
+# *Why* is this bad?
+
+--
+
+- **80% of studies yield false negatives** - so *p-hacking* starts &lt;br&gt;&lt;br&gt;
+
+--
+
+- True positives **overestimate** effect by 125.5% (which ensures that future studies are under-powered)&lt;br&gt;&lt;br&gt;
+
+--
+
+- If we had **no p-hacking** and test **50% true hypotheses**, this means that *1 out of 5* significant research findings would be false. (We *know* there is p-hacking.)   
+---
+
+# Simulation results - 80% power
+
+
+```r
+library(pwr)
+pwr.t.test(d = .2, power = .8, sig.level = .05)
+```
+
+--
+
+
+```
+## 
+##      Two-sample t test power calculation 
+## 
+##               n = 393.4057
+##               d = 0.2
+##       sig.level = 0.05
+##           power = 0.8
+##     alternative = two.sided
+## 
+## NOTE: n is number in *each* group
+```
+
+---
+
+#### Results of **5000 experiments** with *d* = .2, *N* = 393 per group
+
+&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
+
+#### Minimum significant effect size: *d* = .14
+#### Average significant effect size: *d* = .23
+#### Share of studies with significant results: 80.8%
+
+---
+
+# Better!
+
+--
+
+- **80%** of studies yield true positives - but, there are **20%** false negatives &lt;br&gt;&lt;br&gt;
+
+--
+
+- (This means that a 67% of 5-study papers should have at least one non-significant result.)&lt;sup&gt;1&lt;/sup&gt;&lt;br&gt;&lt;br&gt;
+
+.footnote[
+[1] See [Lakens &amp; Etz, 2017](https://osf.io/preprints/psyarxiv/nnkg9) and related [simulation app](https://shiny.ieis.tue.nl/mixed_results_likelihood/)
+]
+
+--
+
+- True positives **still overestimate** effect by 12.8% (consider in power calculations)&lt;br&gt;&lt;br&gt;
+
+---
+
+class: inverse center middle
+
+# How to run high-powered studies?
+
+---
+
+## Factors that influence statistical power
+
+- &amp;alpha; level
+
+--
+  - multiple comparisons (*planned contrasts*)&lt;br&gt;
+--
+
+
+- effect size
+  - true effect
+  - measurement error&lt;br&gt;
+--
+
+
+- statistical procedure
+  - e.g., binning data
+  - repeated measures&lt;br&gt;
+--
+
+
+- sample size
+---
+
+## Example 
+
+We run a 2x2 study - gender x intervention - and primarily care about the intervention effects by gender.
+--
+&lt;br&gt;&lt;br&gt;**Base case:** 50 participants per cell, d = .4, &amp;alpha; = .05/6 (*Bonferroni* for all post-hoc tests) &lt;br&gt;
+power: `pwr.t.test(n = 50, d = .4, sig.level = .05/6)`: 25.0%
+--
+&lt;br&gt;&lt;br&gt;**Focus on two post-hoc tests:**   &lt;br&gt;
+power: `pwr.t.test(n = 50, d = .4, sig.level = .05/2)`: 39.5%
+--
+&lt;br&gt;&lt;br&gt;and **Increase effect size** (e.g., improve measurement): &lt;br&gt;
+`pwr.t.test(n = 50, d = .6, sig.level = .05/2)`: 76.4%
+--
+&lt;br&gt;&lt;br&gt;or **Switch towards repeated measures** / paired tests:  &lt;br&gt;
+  `pwr.t.test(n = 50, d = .4, sig.level = .05/2, type = "paired")`: 69.6%
+--
+&lt;br&gt;&lt;br&gt;or **increase sample size** to 150 participants per cell:  &lt;br&gt;
+  power: `pwr.t.test(n = 150, d = .4, sig.level = .05/6)`: 79.0%
+
+---
+class: inverse center middle
+
+## Effect sizes
+---
+
+## Power depends on effect size
+
+.pull-left[
+
+- Need to decide on expected effect size, ideally for specific field
+{{content}}
+
+]
+
+.pull-right[
+
+]
+
+--
+
+- *Not* based on under-powered previous studies
+- *Definitely not* based on under-powered pilot study!
+{{content}}
+--
+
+- Look for **meta-analyses** that consider publication bias.
+{{content}}
+--
+
+- Effect sizes can easily be converted (e.g., *r* to *d* or *f*), e.g., with this [online converter](https://www.escal.site/)
+
+
+- Effect sizes always express the association/difference as a share of the variance (true variance + measurement error).
+---
+
+## Power depends on effect size
+
+.pull-left[
+
+- Need to decide on expected effect size, ideally for specific field
+
+
+- *Not* based on under-powered previous studies
+
+- *Definitely not* based on under-powered pilot study!
+
+
+- Look for **meta-analyses** that consider publication bias.
+
+
+- Effect sizes can easily be converted (e.g., *r* to *d* or *f*), e.g., with this [online converter](https://www.escal.site/)
+
+
+- Effect sizes always express the association/difference as a share of the variance (true variance + measurement error).
+]
+
+.pull-right[
+- If necessary, consider heuristics, but not (just) Cohen!
+
+&gt; Benchmarks are "recommended for use only when no better basis for estimating the index is available" (Cohen, 1988)
+
+{{content}}
+]
+
+--
+
+![Observed effect sizes in psychology](power benchmarks.jpg)
+{{content}}
+--
+
+- Other fields (e.g., [education](https://www.bristol.ac.uk/media-library/sites/cmpo/documents/WP15337_Web_Version.pdf)) have smaller average effect sizes
+
+---
+
+## How to calculate power
+
+- G*Power ([guide](https://osf.io/zqphw/)) works for most (simple) situations
+
+- So does the `pwr` package in R [[introduction video](https://www.youtube.com/watch?v=ZIjOG8LTTh8)], and the results are more transparent (all settings are in the command, so can report what you have done) 
+
+--
+
+
+
+- For (relatively simple) mediation models, there is a good [simulation webapp](https://schoemanna.shinyapps.io/mc_power_med/) that can also be [run in RStudio](https://marlab.org/power_mediation/) (faster)&lt;sup&gt;1&lt;/sup&gt;
+
+- For 2x2 ANOVAs, there are also some good webapps - in a moment.
+
+--
+
+
+
+- Detailed examples and suggestions for further tools (as well as more on effect sizes) can be found in this [collaborative guide](https://docs.google.com/document/d/1_vNjPCI7H52T8tav1reYgWx6puMT03JZVY1wvEPHrWU/edit#)
+
+---
+
+## The problem with interactions
+
+.pull-left[
+#### Sample size requirements
+
+{{content}}
+
+
+
+]
+
+.pull-right[
+
+
+
+]
+
+--
+
+- Let's consider testing a large main effect (giving people a placebo pill, assuming *d* = .6) - 44 participants per group, 88 in total for 80 % power.
+{{content}}
+
+--
+
+- Let's hypothesize that some moderator *eliminates* the effect in a 2x2 design (e.g., telling some that it is a placebo). Now we have four groups, and a smaller effect - so need *twice* the number of participants *per cell* - instead of 2 * 44, now 2 * 2 * (2 * 44), i.e. **4x the original sample.**
+{{content}}
+
+--
+
+- Usually, moderator won't *eliminate* the effect, but *attenuate* it. If 30% of effect remains, we need 4 times as many per cell - **8x the original sample.**
+{{content}}
+--
+
+- See [Datacolada](http://datacolada.org/17) for details and implications for three-way interactions (*spoiler:* need 32 times the sample size.)
+
+
+---
+
+## The problem with interactions
+
+.pull-left[
+
+#### Sample size requirements
+
+- Let's consider testing a large main effect (giving people a placebo pill, assuming *d* = .6) - 44 participants per group, 88 in total for 80 % power.
+
+
+- Now, let's hypothesize that some moderator *eliminates* the effect in a 2x2 design (e.g., telling some that it is a placebo). Now we have four groups, and a smaller effect - so need *twice* the number of participants *per cell* - instead of 2 * 44, now 2 * 2 * (2 * 44), i.e. 4x the original sample.
+
+
+- Usually, moderator won't *eliminate* the effect, but *attenuate* it. If 30% of effect remains, we need 4 times as many per cell - 8x the original sample.
+
+
+- See [Datacolada](http://datacolada.org/17) for details and implications for 3-way interactions (*spoiler:* need 32 times the sample size.)
+
+]
+
+.pull-right[
+
+
+#### Estimating interaction effect sizes
+
+{{content}}
+
+]
+
+--
+
+- Effect size very hard to estimate in factorial designs (intuitions for eta-squared for interaction?). Best approach can be to *draw the expected simple slopes* and identify the expected pattern of means.
+
+{{content}}
+
+--
+
+- There is an intuitive [web app](https://markhw.shinyapps.io/power_twoway/) to support this. If you have RStudio, you can also [download it](https://github.com/markhwhiteii/power_twoway) and run it locally.
+
+{{content}}
+
+--
+
+- Another webapp can be found [here](https://shiny.ieis.tue.nl/anova_power/) - allows for between-factors and produces reports that you can save.
+
+{{content}}
+
+--
+
+- (Often, continuous variables are binned for interaction tests - increases measurement error, and thus typically decreases effect size.)
+
+]
+
+---
+class: inverse, center, middle
+
+# Thanks!
+
+Slides are available on [http://lukaswallrich.github.io/power_bbk-OP/]
+
+Slides created via the R packages:
+
+[**xaringan**](https://github.com/yihui/xaringan)&lt;br&gt;
+[gadenbuie/xaringanthemer](https://github.com/gadenbuie/xaringanthemer)
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
