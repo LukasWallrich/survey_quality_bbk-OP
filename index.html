@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Statistical power</title>
+    <title>Ensuring survey data quality</title>
     <meta charset="utf-8" />
     <meta name="author" content="Lukas Wallrich" />
     <script src="index_files/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="my_css.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Statistical power
-## and sample size determination
+# Ensuring survey data quality
+## during data collection
 ### Lukas Wallrich
 ### Birkbeck OP - Quant Group
-### 2021/10/26
+### 2022/01/25
 
 ---
 
@@ -26,387 +27,133 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
-# Recap: Null-hypothesis significance testing
+# Why care about data quality?
 --
 
-## .red[How likely is our data under the null hypothesis?]
+## .red[Strength of statistical evidence:]
 
 --
-## &lt; &amp;alpha; *reject* | &gt; &amp;alpha; *accept* the null
+### Signal *minus noise*
+
+--
+
+## .red[Accuracy of conclusions:]
+
+--
+### Data issues can introduce *bias*
+
+---
+
+# Aims
+
+## Get responses from *people*
+--
+
+## Get responses from *the right* people
+--
+
+## Get *good* responses from the right people
+--
+
+## Get ready to *filter out* bad responses
+
+---
+
+# Blocking bots
+
+### __Risk:__ 
+
+AI and/or human-assisted bots responding to surveys - *known* on MTurk
+
+--
+
+### Action:
+
+- Captcha (available in Qualtrics)
+- Duplicate IP/geo-blocking (external tool needed)
+
+---
+
+# The right people
+
+### __Risk:__ 
+People ignoring/evading eligibility criteria [(Chandler &amp; Paloacci, 2017)](https://journals.sagepub.com/doi/full/10.1177/1948550617698203)
+
+--
+
+### __Action:__ 
+
+- double-check eligibility criteria in survey [(Prolific-recommended)](https://researcher-help.prolific.co/hc/en-gb/articles/360010165173-Can-I-screen-participants-within-my-survey-#heading-2)
+
+--
+
+... consider non-obvious ways (e.g., postcode rather than location)
+
+
+-- 
+
+### __Risk:__ 
+sample becoming imbalanced [(TikTok video broke Prolific)](https://www.theverge.com/2021/9/24/22688278/tiktok-science-study-survey-prolific)
+
+-- 
+
+### __Action:__ 
+consider quota sampling [generally under-utilised?]
+
+---
+
+# Increasing quality / filtering responses
+
+### Risk:
+
+- Fatigue / response set / disengagement 
+- Have 'shirkers' slip through the net [(Berisky et al., 2013)](https://onlinelibrary.wiley.com/doi/full/10.1111/ajps.12081)
+
+
+--
+
+### Action: Keep respondents engaged
+
+- Survey &amp; scale length
+- Ordering: substance first
+- ??
+
+
+--
+
+### Action: Prepare for filtering
+
+- Free text question (remove bots &amp; fully disengaged)
+- Attention checks .red[(*problematic*)]
+
+---
+
+# Attention checks
+![Attention check](attention_check.jpg)
+
+
+__Questions:__
+
+- **Fairness:** [Prolific says](https://researcher-help.prolific.co/hc/en-gb/articles/360009223553) *question text only*, not about instructions, so above would not be acceptable
+- **Reaction:** [Qualtrics research](https://www.qualtrics.com/blog/using-attention-checks-in-your-surveys-may-harm-data-quality/) suggests that attention checks might reduce *subsequent* data quality
+- **Bias:** filtering based on attention checks introduces bias - e.g., towards conscientious participants (same for *careless* procedures?)
+- **Measurement error:** attention checks measure attentiveness, typically with binary outcome. Single item binary measure cannot be psychometrically sound.
 
 ---
 class: inverse, center, middle
 
-# Power
+background-image: background.jpg
 
-#### Probability of __correctly__ rejecting null hypothesis
+# So - what to do? 
 
---
-
-# Publication bias
-
-#### Tendency to only/mostly publish __significant__ results
-
----
-## Psychological studies are under-powered
-
-![Power in psychology studies](Stanley et al - Table1.jpg)
-#### General Aim: run studies with at least **80% power**
-#### Studies reporting **mean differences** - likely experiments - particularly underpowered
-
-.footnote[[Stanley et al., 2018](http://www2.psych.utoronto.ca/users/tafarodi/psy428/articles/Stanley%20et%20al.%20%282018%29.pdf)]
----
-
-# Simulation results - 20% power
-
-
-```r
-library(pwr)
-pwr.t.test(d = .2, power = .2, sig.level = .05)
-```
-
---
-
-
-```
-## 
-##      Two-sample t test power calculation 
-## 
-##               n = 63.08413
-##               d = 0.2
-##       sig.level = 0.05
-##           power = 0.2
-##     alternative = two.sided
-## 
-## NOTE: n is number in *each* group
-```
-
-
----
-
-#### Results of **5000 experiments** with *d* = .2, *N* = 63 per group
-
-&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="100%" /&gt;
-
-#### Minimum significant effect size: *d* = .36
-#### Average significant effect size: *d* = .45
-#### Share of studies with significant results: 19.5%
-
----
-
-# *Why* is this bad?
-
---
-
-- **80% of studies yield false negatives** - so *p-hacking* starts &lt;br&gt;&lt;br&gt;
-
---
-
-- True positives **overestimate** effect by 125.5% (which ensures that future studies are under-powered)&lt;br&gt;&lt;br&gt;
-
---
-
-- If we had **no p-hacking** and test **50% true hypotheses**, this means that *1 out of 5* significant research findings would be false. (We *know* there is p-hacking.)   
----
-
-# Simulation results - 80% power
-
-
-```r
-library(pwr)
-pwr.t.test(d = .2, power = .8, sig.level = .05)
-```
-
---
-
-
-```
-## 
-##      Two-sample t test power calculation 
-## 
-##               n = 393.4057
-##               d = 0.2
-##       sig.level = 0.05
-##           power = 0.8
-##     alternative = two.sided
-## 
-## NOTE: n is number in *each* group
-```
-
----
-
-#### Results of **5000 experiments** with *d* = .2, *N* = 393 per group
-
-&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="100%" /&gt;
-
-#### Minimum significant effect size: *d* = .14
-#### Average significant effect size: *d* = .23
-#### Share of studies with significant results: 80.8%
-
----
-
-# Better!
-
---
-
-- **80%** of studies yield true positives - but, there are **20%** false negatives &lt;br&gt;&lt;br&gt;
-
---
-
-- (This means that a 67% of 5-study papers should have at least one non-significant result.)&lt;sup&gt;1&lt;/sup&gt;&lt;br&gt;&lt;br&gt;
-
-.footnote[
-[1] See [Lakens &amp; Etz, 2017](https://osf.io/preprints/psyarxiv/nnkg9) and related [simulation app](https://shiny.ieis.tue.nl/mixed_results_likelihood/)
-]
-
---
-
-- True positives **still overestimate** effect by 12.8% (consider in power calculations)&lt;br&gt;&lt;br&gt;
-
----
-
-class: inverse center middle
-
-# How to run high-powered studies?
-
----
-
-## Factors that influence statistical power
-
-- &amp;alpha; level
-
---
-  - multiple comparisons (*planned contrasts*)&lt;br&gt;
---
-
-
-- effect size
-  - true effect
-  - measurement error&lt;br&gt;
---
-
-
-- statistical procedure
-  - e.g., binning data
-  - repeated measures&lt;br&gt;
---
-
-
-- sample size
----
-
-## Example 
-
-We run a 2x2 study - gender x intervention - and primarily care about the intervention effects by gender.
---
-&lt;br&gt;&lt;br&gt;**Base case:** 50 participants per cell, d = .4, &amp;alpha; = .05/6 (*Bonferroni* for all post-hoc tests) &lt;br&gt;
-power: `pwr.t.test(n = 50, d = .4, sig.level = .05/6)`: 25.0%
---
-&lt;br&gt;&lt;br&gt;**Focus on two post-hoc tests:**   &lt;br&gt;
-power: `pwr.t.test(n = 50, d = .4, sig.level = .05/2)`: 39.5%
---
-&lt;br&gt;&lt;br&gt;and **Increase effect size** (e.g., improve measurement): &lt;br&gt;
-`pwr.t.test(n = 50, d = .6, sig.level = .05/2)`: 76.4%
---
-&lt;br&gt;&lt;br&gt;or **Switch towards repeated measures** / paired tests:  &lt;br&gt;
-  `pwr.t.test(n = 50, d = .4, sig.level = .05/2, type = "paired")`: 69.6%
---
-&lt;br&gt;&lt;br&gt;or **increase sample size** to 150 participants per cell:  &lt;br&gt;
-  power: `pwr.t.test(n = 150, d = .4, sig.level = .05/6)`: 79.0%
-
----
-class: inverse center middle
-
-## Effect sizes
----
-
-## Power depends on effect size
-
-.pull-left[
-
-- Need to decide on expected effect size, ideally for specific field
-{{content}}
-
-]
-
-.pull-right[
-
-]
-
---
-
-- *Not* based on under-powered previous studies
-- *Definitely not* based on under-powered pilot study!
-{{content}}
---
-
-- Look for **meta-analyses** that consider publication bias.
-{{content}}
---
-
-- Effect sizes can easily be converted (e.g., *r* to *d* or *f*), e.g., with this [online converter](https://www.escal.site/)
-
-
-- Effect sizes always express the association/difference as a share of the variance (true variance + measurement error).
----
-
-## Power depends on effect size
-
-.pull-left[
-
-- Need to decide on expected effect size, ideally for specific field
-
-
-- *Not* based on under-powered previous studies
-
-- *Definitely not* based on under-powered pilot study!
-
-
-- Look for **meta-analyses** that consider publication bias.
-
-
-- Effect sizes can easily be converted (e.g., *r* to *d* or *f*), e.g., with this [online converter](https://www.escal.site/)
-
-
-- Effect sizes always express the association/difference as a share of the variance (true variance + measurement error).
-]
-
-.pull-right[
-- If necessary, consider heuristics, but not (just) Cohen!
-
-&gt; Benchmarks are "recommended for use only when no better basis for estimating the index is available" (Cohen, 1988)
-
-{{content}}
-]
-
---
-
-![Observed effect sizes in psychology](power benchmarks.jpg)
-{{content}}
---
-
-- Other fields (e.g., [education](https://www.bristol.ac.uk/media-library/sites/cmpo/documents/WP15337_Web_Version.pdf)) have smaller average effect sizes
-
----
-
-## How to calculate power
-
-- G*Power ([guide](https://osf.io/zqphw/)) works for most (simple) situations
-
-- So does the `pwr` package in R [[introduction video](https://www.youtube.com/watch?v=ZIjOG8LTTh8)], and the results are more transparent (all settings are in the command, so can report what you have done) 
-
---
-
-
-
-- For (relatively simple) mediation models, there is a good [simulation webapp](https://schoemanna.shinyapps.io/mc_power_med/) that can also be [run in RStudio](https://marlab.org/power_mediation/) (faster)&lt;sup&gt;1&lt;/sup&gt;
-
-- For 2x2 ANOVAs, there are also some good webapps - in a moment.
-
---
-
-
-
-- Detailed examples and suggestions for further tools (as well as more on effect sizes) can be found in this [collaborative guide](https://docs.google.com/document/d/1_vNjPCI7H52T8tav1reYgWx6puMT03JZVY1wvEPHrWU/edit#)
-
----
-
-## The problem with interactions
-
-.pull-left[
-#### Sample size requirements
-
-{{content}}
-
-
-
-]
-
-.pull-right[
-
-
-
-]
-
---
-
-- Let's consider testing a large main effect (giving people a placebo pill, assuming *d* = .6) - 44 participants per group, 88 in total for 80 % power.
-{{content}}
-
---
-
-- Let's hypothesize that some moderator *eliminates* the effect in a 2x2 design (e.g., telling some that it is a placebo). Now we have four groups, and a smaller effect - so need *twice* the number of participants *per cell* - instead of 2 * 44, now 2 * 2 * (2 * 44), i.e. **4x the original sample.**
-{{content}}
-
---
-
-- Usually, moderator won't *eliminate* the effect, but *attenuate* it. If 30% of effect remains, we need 4 times as many per cell - **8x the original sample.**
-{{content}}
---
-
-- See [Datacolada](http://datacolada.org/17) for details and implications for three-way interactions (*spoiler:* need 32 times the sample size.)
-
-
----
-
-## The problem with interactions
-
-.pull-left[
-
-#### Sample size requirements
-
-- Let's consider testing a large main effect (giving people a placebo pill, assuming *d* = .6) - 44 participants per group, 88 in total for 80 % power.
-
-
-- Now, let's hypothesize that some moderator *eliminates* the effect in a 2x2 design (e.g., telling some that it is a placebo). Now we have four groups, and a smaller effect - so need *twice* the number of participants *per cell* - instead of 2 * 44, now 2 * 2 * (2 * 44), i.e. 4x the original sample.
-
-
-- Usually, moderator won't *eliminate* the effect, but *attenuate* it. If 30% of effect remains, we need 4 times as many per cell - 8x the original sample.
-
-
-- See [Datacolada](http://datacolada.org/17) for details and implications for 3-way interactions (*spoiler:* need 32 times the sample size.)
-
-]
-
-.pull-right[
-
-
-#### Estimating interaction effect sizes
-
-{{content}}
-
-]
-
---
-
-- Effect size very hard to estimate in factorial designs (intuitions for eta-squared for interaction?). Best approach can be to *draw the expected simple slopes* and identify the expected pattern of means.
-
-{{content}}
-
---
-
-- There is an intuitive [web app](https://markhw.shinyapps.io/power_twoway/) to support this. If you have RStudio, you can also [download it](https://github.com/markhwhiteii/power_twoway) and run it locally.
-
-{{content}}
-
---
-
-- Another webapp can be found [here](https://shiny.ieis.tue.nl/anova_power/) - allows for between-factors and produces reports that you can save.
-
-{{content}}
-
---
-
-- (Often, continuous variables are binned for interaction tests - increases measurement error, and thus typically decreases effect size.)
-
-]
+## Questions, comments and recommendations?
 
 ---
 class: inverse, center, middle
 
 # Thanks!
 
-Slides are available on [http://lukaswallrich.github.io/power_bbk-OP/]
+Slides are available on [http://lukaswallrich.github.io/survey_quality_bbk-OP/]
 
 Slides created via the R packages:
 
